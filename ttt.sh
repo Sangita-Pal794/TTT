@@ -27,5 +27,67 @@ displayBoard(){
 	echo ""
 }
 
-displayBoard
+winCheck(){
+	for pos in ${WIN_SET[@]}
+	do
+		first=${pos:0:1}
+		second=${pos:1:1}
+		third=${pos:2:1}
+		if [ ${gameBoard[$first]} != "-" ] && [ ${gameBoard[$first]} == ${gameBoard[$second]} ] && [ ${gameBoard[$second]} == ${gameBoard[$third]} ] 
+		then
+    		winStatus=1
+		fi
+	done
+}
+
+tieCheck(){
+	if [[ ! ${gameBoard[@]} =~ [-] ]]
+    	then
+		echo -e "TIE! GAME ENDS\nEND BOARD"
+        	displayBoard
+        exit
+    	fi
+}
+statusCheck(){
+	winCheck
+	if [[ $winStatus -eq 1 ]]
+	then
+		displayBoard
+		echo "$1 wins"
+		exit
+	fi
+	tieCheck
+	return 1
+}
+
+play(){
+	while [[ $winStatus != 1 ]]
+	do
+		if [[ $1 == $PLAYER ]]
+		then
+			playerPlay
+			compPlay
+		else
+			compPlay
+			playerPlay
+		fi
+	done
+}
+read -p "ENTER PLAYER NAME " PLAYER
+startGame(){
+	if [[ $toss -eq 0 ]]
+	then
+		echo -e "$PLAYER's turn"
+		read -p "WHICH WOULD YOU LIKE TO CHOOSE (X/O)? " playerChoice
+		displayBoard
+		[ $playerChoice == "X" ] && compChoice="O" || compChoice="X"
+		play $PLAYER
+	else
+		compChoice="X"
+		playerChoice="O"
+		play
+	fi
+}
+
+startGame
 
